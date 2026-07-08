@@ -38,19 +38,19 @@ flowchart LR
     Engine -->|Decrypted NAT Egress| WWW
 ```
 
-    🚀 Key Engineering Features
+## 🚀 Key Engineering Features
 Edge-Proxied Ingress: Standardized transport protocols exclusively on WebSocket (WS) to integrate seamlessly with CDN reverse proxies. This approach shields the origin server's direct IP and absorbs external network scanning.
 
 Strict Security Perimeter: Enforced end-to-end TLS 1.3 encryption using custom Origin CA certificates, coupled with OS-level Netfilter (iptables) policies to drop all unauthenticated external traffic.
 
 Kernel Optimization: Tuned the Linux networking stack by configuring IPv4/IPv6 dual-stack routing and enabling TCP BBR (Bottleneck Bandwidth and RTT) to maximize transmission efficiency and stability over high-latency routes.
 
-📂 Repository Structure
+## 📂 Repository Structure
 /configs/ - Contains baseline configuration scripts for OS-level tuning (sysctl) and firewall hardening (iptables).
 
 /assets/ - Contains exported high-resolution architecture diagrams.
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 Cloud & Edge: Oracle Cloud Infrastructure (OCI), Cloudflare
 
 OS & Networking: Ubuntu Linux, TCP/IP, IPv4/IPv6 Dual-Stack
