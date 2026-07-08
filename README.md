@@ -36,8 +36,6 @@ flowchart LR
     Client -->|Encrypted Requests| CDN
     CDN -->|Standardized HTTP/WSS| FW
     MUX -->|Decrypted NAT Egress| WWW
-
-
 🚀 Key Engineering Features
 Edge-Proxied Ingress: Standardized transport protocols (WebSocket/gRPC) to integrate seamlessly with CDN reverse proxies, masking the origin IP and absorbing malicious scanning.
 
@@ -46,3 +44,19 @@ Transport Resilience: Leveraged HTTP/2 multiplexing principles to significantly 
 Strict Security Perimeter: Enforced end-to-end TLS 1.3 encryption using custom Origin CA certificates, coupled with OS-level Netfilter policies to drop all unauthenticated traffic.
 
 Kernel Optimization: Tuned Linux networking stack by enabling TCP BBR (Bottleneck Bandwidth and RTT) to maximize transmission efficiency over long-distance routes.
+
+📂 Repository Structure
+/configs/ - Contains baseline configuration scripts for OS-level tuning and firewall hardening.
+
+/assets/ - Contains exported high-resolution architecture diagrams.
+
+🛠️ Tech Stack
+Cloud & Edge: Oracle Cloud Infrastructure (OCI), Cloudflare
+
+OS & Networking: Ubuntu Linux, TCP/IP, IPv4/IPv6 Dual-Stack
+
+Protocols: WebSocket (WS), gRPC, TLS 1.3
+
+Automation: Bash Scripting, Netfilter (iptables)
+
+Architected and maintained by  Milad
