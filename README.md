@@ -1,13 +1,13 @@
-# Unified Edge Routing & Resilience Architecture
+# Secure Edge Routing Infrastructure
 
 ## 📌 Project Overview
-This repository contains the architectural design and system baselines for a highly available, fault-tolerant edge routing infrastructure deployed on Oracle Cloud Infrastructure (OCI). 
+This repository contains the architectural design and system baselines for a secure, high-performance edge routing infrastructure deployed on Oracle Cloud Infrastructure (OCI). 
 
-Engineered to operate reliably in high-latency environments with unpredictable packet loss, this unified architecture bridges edge-level security (CDN proxying) with transport-level resilience (HTTP/2 multiplexing). The focus is on secure traffic encapsulation, origin server protection, and automated system hardening.
+Engineered to operate reliably in environments with unpredictable network conditions, this architecture bridges edge-level security (CDN proxying) with transport-level optimization. The primary focus is on secure traffic encapsulation, origin server protection, and automated Linux system hardening.
 
-## 🏗️ Unified Architecture
+## 🏗️ Core Architecture
 
-The system routes traffic through a secure edge layer, standardizes the transport to ensure compatibility, and utilizes multiplexing to maintain throughput during network congestion.
+The system routes traffic through a secure edge layer and standardizes the transport to ensure seamless compatibility with standard HTTP-based environments, effectively shielding the origin infrastructure.
 
 ```mermaid
 flowchart LR
@@ -25,8 +25,8 @@ flowchart LR
     subgraph OCILayer [Oracle Cloud Infrastructure]
         direction LR
         FW[🛡️ Ingress Firewall<br>Linux Netfilter]:::internal
-        MUX[⚙️ Traffic Multiplexer<br>gRPC / WS Transport]:::internal
-        FW -->|Authorized Streams| MUX
+        Engine[⚙️ Routing Engine<br>WebSocket Transport]:::internal
+        FW -->|Authorized Streams| Engine
     end
 
     subgraph EgressLayer [External Network]
@@ -34,29 +34,5 @@ flowchart LR
     end
 
     Client -->|Encrypted Requests| CDN
-    CDN -->|Standardized HTTP/WSS| FW
-    MUX -->|Decrypted NAT Egress| WWW
-🚀 Key Engineering Features
-Edge-Proxied Ingress: Standardized transport protocols (WebSocket/gRPC) to integrate seamlessly with CDN reverse proxies, masking the origin IP and absorbing malicious scanning.
-
-Transport Resilience: Leveraged HTTP/2 multiplexing principles to significantly reduce connection drops and maintain stable throughput during TCP throttling events.
-
-Strict Security Perimeter: Enforced end-to-end TLS 1.3 encryption using custom Origin CA certificates, coupled with OS-level Netfilter policies to drop all unauthenticated traffic.
-
-Kernel Optimization: Tuned Linux networking stack by enabling TCP BBR (Bottleneck Bandwidth and RTT) to maximize transmission efficiency over long-distance routes.
-
-📂 Repository Structure
-/configs/ - Contains baseline configuration scripts for OS-level tuning and firewall hardening.
-
-/assets/ - Contains exported high-resolution architecture diagrams.
-
-🛠️ Tech Stack
-Cloud & Edge: Oracle Cloud Infrastructure (OCI), Cloudflare
-
-OS & Networking: Ubuntu Linux, TCP/IP, IPv4/IPv6 Dual-Stack
-
-Protocols: WebSocket (WS), gRPC, TLS 1.3
-
-Automation: Bash Scripting, Netfilter (iptables)
-
-Architected and maintained by  Milad
+    CDN -->|Standardized WSS Traffic| FW
+    Engine -->|Decrypted NAT Egress| WWW
