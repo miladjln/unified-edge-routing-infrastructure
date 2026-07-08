@@ -60,4 +60,6 @@ Protocols: WebSocket (WSS), TLS 1.3
 
 Administration: Bash Scripting, Netfilter, Linux Kernel Tuning
 
-Architected and maintained by  Milad 
+Architected and maintained by Milad.
+
+This project was purely educational and practice-oriented.
