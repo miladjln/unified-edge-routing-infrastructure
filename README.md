@@ -1,65 +1,67 @@
 # Secure Edge Routing Infrastructure
 
-## 📌 Project Overview
-This repository contains the architectural design and system baselines for a secure, high-performance edge routing infrastructure deployed on Oracle Cloud Infrastructure (OCI). 
+An educational Linux and Oracle Cloud Infrastructure (OCI) project showing secure edge ingress, origin protection, and host hardening. The repository is intended to demonstrate infrastructure reasoning for cloud engineering roles. It is a reference baseline, not a managed service, security certification, or claim of production availability.
 
-Engineered to operate reliably in environments with unpredictable network conditions, this architecture bridges edge-level security (CDN proxying) with transport-level optimization. The primary focus is on secure traffic encapsulation, origin server protection, and automated Linux system hardening.
-
-## 🏗️ Core Architecture
-
-The system routes traffic through a secure edge layer and standardizes the transport to ensure seamless compatibility with standard HTTP-based environments, effectively shielding the origin infrastructure.
+## Architecture
 
 ```mermaid
 flowchart LR
-    classDef client fill:#f3f4f6,stroke:#9ca3af,stroke-width:2px,color:#1f2937;
-    classDef edge fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e;
-    classDef internal fill:#ffffff,stroke:#db2777,stroke-width:1px,color:#1f2937;
-    classDef internet fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
-
-    Client([💻 Remote Clients]):::client
-
-    subgraph EdgePerimeter [Edge Perimeter]
-        CDN[☁️ CDN Bridge Layer<br>TLS 1.3 Strict Enforcement]:::edge
-    end
-
-    subgraph OCILayer [Oracle Cloud Infrastructure]
-        direction LR
-        FW[🛡️ Ingress Firewall<br>Linux Netfilter]:::internal
-        Engine[⚙️ Routing Engine<br>WebSocket Transport]:::internal
-        FW -->|Authorized Streams| Engine
-    end
-
-    subgraph EgressLayer [External Network]
-        WWW((🌐 Global Internet)):::internet
-    end
-
-    Client -->|Encrypted Requests| CDN
-    CDN -->|Standardized WSS Traffic| FW
-    Engine -->|Decrypted NAT Egress| WWW
+    Client[Remote clients] --> Edge[Managed edge ingress]
+    Edge --> FW[Linux netfilter]
+    FW --> App[Origin application]
+    App --> Egress[Approved outbound services]
 ```
 
+The managed edge is a public trust boundary. The OCI host applies explicit stateful ingress policy, limits administration to configured networks, and can forward traffic when the workload requires it. Cloud firewall rules, application controls, TLS configuration, identity, and monitoring remain separate responsibilities.
 
-## 🚀 Key Engineering Features
-Edge-Proxied Ingress: Standardized transport protocols exclusively on WebSocket (WS) to integrate seamlessly with CDN reverse proxies. This approach shields the origin server's direct IP and absorbs external network scanning.
+![Educational edge architecture](assets/Edge%20Network%20Traffic.jpg)
 
-Strict Security Perimeter: Enforced end-to-end TLS 1.3 encryption using custom Origin CA certificates, coupled with OS-level Netfilter (iptables) policies to drop all unauthenticated external traffic.
+## Engineering scope
 
-Kernel Optimization: Tuned the Linux networking stack by configuring IPv4/IPv6 dual-stack routing and enabling TCP BBR (Bottleneck Bandwidth and RTT) to maximize transmission efficiency and stability over high-latency routes.
+- Conservative IPv4 and IPv6 netfilter policy with explicit administrator and edge CIDRs.
+- Linux sysctl baseline for forwarding, redirect/source-route handling, TCP resilience, and measured queueing.
+- Operational documentation covering assumptions, validation, monitoring, and rollback.
+- Lightweight shell validation and GitHub Actions checks for syntax and unsafe regressions.
 
-## 📂 Repository Structure
-/configs/ - Contains baseline configuration scripts for OS-level tuning (sysctl) and firewall hardening (iptables).
+This project uses Bash, Netfilter, Linux kernel tuning, OCI concepts, and standard TLS-protected HTTP application ingress. It does not bundle an application, certificate authority, cloud provisioning, or edge-provider configuration.
 
-/assets/ - Contains exported high-resolution architecture diagrams.
+## Threat model and assumptions
 
-## 🛠️ Tech Stack
-Cloud & Edge: Oracle Cloud Infrastructure (OCI), Cloudflare
+See [docs/security-model.md](docs/security-model.md). In brief, clients and the public network are untrusted; the edge provider, cloud account, and origin are separate trust boundaries. The baseline reduces accidental port exposure and common network misconfiguration, but does not address application vulnerabilities, stolen credentials, provider compromise, volumetric denial of service, or operational mistakes.
 
-OS & Networking: Ubuntu Linux, TCP/IP, IPv4/IPv6 Dual-Stack
+## Deployment and validation
 
-Protocols: WebSocket (WSS), TLS 1.3
+Read [docs/operations.md](docs/operations.md) before changing a host. Provide administrator CIDRs and, unless intentionally choosing public HTTPS, the edge provider's current CIDRs:
 
-Administration: Bash Scripting, Netfilter, Linux Kernel Tuning
+```bash
+export ADMIN_IPV4_CIDRS="203.0.113.10/32"
+export EDGE_IPV4_CIDRS="198.51.100.0/24"
+sudo -E ./configs/netfilter-hardening.sh --dry-run
+sudo sysctl --system
+sudo -E ./configs/netfilter-hardening.sh
+```
 
-Architected and maintained by Milad.
+Keep an existing SSH session open, verify a second session and the application, and retain console access. Never use an unrestricted SSH rule. Run `bash tests/validate-configs.sh`; CI also runs ShellCheck. The example networks above are documentation-only ranges and must be replaced.
 
-This project was purely educational and practice-oriented.
+## Measurable outcomes
+
+The repository provides verifiable configuration outcomes: SSH is denied unless an administrator CIDR is supplied; edge ingress is restricted unless public HTTPS is explicitly enabled; IPv4 and IPv6 policies are both handled; syntax and policy checks run in CI. Performance, availability, latency, and security outcomes are intentionally not claimed here and must be measured in the target environment.
+
+## Interview talking points
+
+- **Defense in depth:** cloud security controls, managed edge policy, host firewall, kernel settings, application controls, and observability have separate responsibilities.
+- **Safe operations:** the firewall requires explicit administrator networks, supports a dry-run, saves the existing rules, and documents console recovery before a change.
+- **Reliability mindset:** IPv4 and IPv6 are treated consistently, return traffic is stateful, and tuning values are documented as measured starting points rather than universal defaults.
+- **Honest scope:** the repository demonstrates infrastructure decisions and validation; it does not claim production scale, a security certification, or performance results without target-environment measurements.
+
+## Repository layout
+
+- `configs/`: host firewall and sysctl baselines.
+- `docs/`: security model and operations runbook.
+- `tests/`: local configuration validation.
+- `assets/`: retained architecture image.
+- `LICENSE`: MIT license.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

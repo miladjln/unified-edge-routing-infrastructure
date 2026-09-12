@@ -1,0 +1,17 @@
+name: Validate configurations
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install --yes shellcheck
+      - name: Validate configuration
+        run: bash tests/validate-configs.sh
+      - name: Shellcheck
+        run: shellcheck configs/netfilter-hardening.sh tests/validate-configs.sh
